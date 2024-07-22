@@ -69,6 +69,7 @@ const loadData = async () => {
 loadData();
 
 const standardizePartOfSpeech = (partOfSpeech) => {
+  partOfSpeech = partOfSpeech.trim();
   const partOfSpeechList = ['danh từ', 'động từ', 'tính từ', 'trạng từ', 'giới từ', 'liên từ', 'đại từ', 'thán từ'];
   if (partOfSpeechList.includes(partOfSpeech.toLowerCase())) return partOfSpeech.charAt(0).toUpperCase() + partOfSpeech.slice(1).toLowerCase();
   const partOfSpeechMap = {
@@ -213,7 +214,7 @@ const updateData = async (id, word, partOfSpeech, meaning) => {
     });
 };
 
-const options = ["Danh", "Động", "Tính", "Trạng"];
+const options = ['Danh', 'Động', 'Tính', 'Trạng', 'Giới', 'Liên', 'Đại từ', 'Thán'];
 const optionString = options
   .map((option, index) => `${index + 1}. ${option} từ`)
   .join("\n");
@@ -273,3 +274,17 @@ const deleteWord = (index) => {
 
 updateTable();
 submitButton.addEventListener("click", addAllWord);
+
+const btnClearAll = document.getElementById("clear");
+
+btnClearAll.addEventListener("click", () => {
+  remove(ref(db, "FlashCard"))
+    .then(() => {
+      console.log("All data deleted Subccessfully");
+      wordList = [];
+      updateTable();
+    })
+    .catch((error) => {
+      console.log("Error deleting all data: ", error.message);
+    });
+})

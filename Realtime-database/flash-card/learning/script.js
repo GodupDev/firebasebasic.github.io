@@ -38,6 +38,7 @@ const randint = (min, max) => {
 };
 
 var Score = 0;
+var maxScore = 0;
 var check = 0;
 var randword = [];
 var randomIndex = 0;
@@ -68,16 +69,15 @@ const loadData = async () => {
   return wordList;
 };
 
-var wordList = await loadData();
-const size = wordList.length;
-console.log(wordList);
+var wordListWord = await loadData();
+var wordListMeaning = wordListWord.slice();
+const size = wordListWord.length * 2;
 
 const updateCard = (randWord) => {
   const flip_card_front = document.getElementById("flip-card-front");
   const flip_card_back = document.getElementById("flip-card-back");
   const inputAns = document.getElementById("inputAns");
   randword = randWord;
-  check = randint(0, 1);
   if (check) {
     flip_card_front.innerHTML = `<p class="title">${randWord.word}</p> <p>${randWord.partOfSpeech}</p>`;
     flip_card_back.innerHTML = `<p class="title">${randWord.meaning}</p>`;
@@ -90,14 +90,36 @@ const updateCard = (randWord) => {
 };
 
 const randWord = () => {
-  const randomIndex = randint(0, wordList.length - 1);
-  updateCard(wordList[randomIndex]);
-  return randomIndex;
+  console.log(wordListWord, wordListMeaning);
+
+  // Kiểm tra độ dài của cả hai mảng
+  if (wordListWord.length > 0 && wordListMeaning.length > 0) {
+    // Chọn ngẫu nhiên một trong hai mảng
+    check = randint(0, 1);
+    const randomArray = check ? wordListWord : wordListMeaning;
+    const randomIndex = randint(0, randomArray.length - 1);
+    updateCard(randomArray[randomIndex]);
+    return randomIndex;
+  } else if (wordListWord.length > 0) {
+    check = 1;
+    const randomIndex = randint(0, wordListWord.length - 1);
+    updateCard(wordListWord[randomIndex]);
+    return randomIndex;
+  } else if (wordListMeaning.length > 0) {
+    check = 0;
+    const randomIndex = randint(0, wordListMeaning.length - 1);
+    updateCard(wordListMeaning[randomIndex]);
+    return randomIndex;
+  } else {
+    // Cả hai mảng đều trống, không thể lấy random
+    return -1;
+  }
 };
 
-randomIndex = randWord();
-
+randomIndex = randWord(wordListWord);
+var clickCheck = 1;
 const CheckAns = () => {
+  clickCheck = 0;
   const answerInput = document.getElementById("answer").value;
   const { word, meaning } = randword;
   const meanings = meaning.split(",").map((m) => m.trim().toLowerCase());
@@ -111,18 +133,19 @@ const CheckAns = () => {
   if (check) {
     if (meanings.includes(answerInput.toLowerCase())) {
       isCorrect = true;
+      wordListWord.splice(randomIndex, 1);
     }
   } else {
-    if (answerInput.toLowerCase() === word.toLowerCase()) {
+    if (answerInput.trim().toLowerCase() === word.trim().toLowerCase()) {
       isCorrect = true;
+      wordListMeaning.splice(randomIndex, 1);
     }
   }
-
   if (isCorrect) {
     Score += 1;
     scoreProgress.style.width = `${(Score / size) * 100}%`;
-    scoreValue.innerHTML = Score;
-    wordList.splice(randomIndex, 1);
+    scoreValue.innerHTML = Score; 
+    maxScore = Math.max(maxScore, Score);
     flip_card_back.style.backgroundColor = `green`;
     flip_card_inner.style.transform = `rotateY(180deg)`;
     flip_card_back.addEventListener("click", () => {
@@ -132,15 +155,19 @@ const CheckAns = () => {
       setTimeout(() => {
       flip_card_back.style.visibility = 'visible';
       }, 800);
+      clickCheck = 1;
     });
     setTimeout(() => {
-      if (Score == size) {
-        const continueLearn = confirm("Bạn đã học hết các từ vựng có muốn học lại hay không");
+      if (wordListWord.length === 0 && wordListMeaning.length === 0) {
+        const continueLearn = confirm(`Bạn đã hoàn thành hết các từ vựng với chuỗi đúng dài nhất là ${maxScore} từ \n Bạn có muốn làm lại không `);
         if (continueLearn) location.reload();
         else window.location = "../home/index.html";
       }
       }, 2000);
   } else {
+    Score = 0;
+    scoreProgress.style.width = `${(Score / size) * 100}%`;
+    scoreValue.innerHTML = Score
     scoreProgress.style.color = `red`;
     flip_card_back.innerHTML += `<p><del>${answerInput}</del></p>`;
     flip_card_back.style.backgroundColor = `red`;
@@ -153,8 +180,11 @@ const CheckAns = () => {
       setTimeout(() => {
       flip_card_back.style.visibility = 'visible';
       }, 800);
+      clickCheck = 1;
     });
   }
 };
 
-btnCheck.addEventListener("click", CheckAns);
+btnCheck.addEventListener("click", () => {
+  if (clickCheck) CheckAns();
+}); 

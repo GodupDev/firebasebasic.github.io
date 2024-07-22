@@ -85,7 +85,7 @@ const updateCard = (randWord) => {
   } else {
     flip_card_front.innerHTML = `<p class="title">${randWord.meaning}</p> <p>${randWord.partOfSpeech}</p>`;
     flip_card_back.innerHTML = `<p class="title">${randWord.word}</p>`;
-    inputAns.innerHTML = `<input type="text" placeholder="Nhập từ có nghĩa trên thẻ" id="answer">`;
+    inputAns.innerHTML = `<input type="text" placeholder="Nhập từ bằng tiếng anh có nghĩa trên thẻ" id="answer">`;
   }
 };
 

@@ -157,6 +157,7 @@ const CheckAns = () => {
       }, 800);
       clickCheck = 1;
     });
+    flip_card_back.innerHTML += `<p>Bấm vào thẻ để làm từ tiếp theo</p>`;
     setTimeout(() => {
       if (wordListWord.length === 0 && wordListMeaning.length === 0) {
         const continueLearn = confirm(`Bạn đã hoàn thành hết các từ vựng với chuỗi đúng dài nhất là ${maxScore} từ \n Bạn có muốn làm lại không `);
@@ -170,6 +171,7 @@ const CheckAns = () => {
     scoreValue.innerHTML = Score
     scoreProgress.style.color = `red`;
     flip_card_back.innerHTML += `<p><del>${answerInput}</del></p>`;
+    flip_card_back.innerHTML += `<p>Bấm vào thẻ để làm từ tiếp theo</p>`;
     flip_card_back.style.backgroundColor = `red`;
     flip_card_inner.style.transform = `rotateY(180deg)`;
 
